@@ -1,0 +1,27 @@
+package main
+
+import (
+	"encoding/json"
+	"log"
+	"os"
+)
+
+type Config struct {
+	SecurityToken string `json:"securityToken"`
+}
+
+func ParseConfig() *Config {
+	jsonFile, err := os.Open("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer jsonFile.Close()
+
+	jsonDecoder := json.NewDecoder(jsonFile)
+	config := &Config{}
+	if err := jsonDecoder.Decode(config); err != nil {
+		log.Fatal(err)
+	}
+
+	return config
+}
