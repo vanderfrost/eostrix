@@ -23,6 +23,13 @@ func main() {
 	}
 
 	disc.AddHandler(onMessage)
+	challenge, err := GetDailyChallenge()
+	if err != nil {
+		log.Printf("Error fetching challenge: %v", err)
+	} else {
+		fmt.Printf("%s\n%s\n%s \nhttps://leetcode.com%s\n",
+			challenge.Title, challenge.Difficulty, challenge.TitleSlug, challenge.Link)
+	}
 
 	//open
 	disc.Open()
