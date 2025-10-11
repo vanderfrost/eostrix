@@ -23,7 +23,9 @@ func main() {
 	}
 
 	disc.AddHandler(onMessage)
-	PostDailyChallenge(disc)
+	scheduleMidnightUTCEvent(func() {
+		PostDailyChallenge(disc)
+	})
 
 	//open
 	disc.Open()
