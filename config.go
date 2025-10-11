@@ -7,7 +7,9 @@ import (
 )
 
 type Config struct {
-	SecurityToken string `json:"securityToken"`
+	SecurityToken  string `json:"securityToken"`
+	DefaultChannel string `json:"defaultChannel"`
+	LeetcodeRoleID string `json:"leetcodeRoleID"`
 }
 
 func ParseConfig() *Config {

@@ -69,6 +69,8 @@ func getDailyChallenge() (LeetcodeChallenge, error) {
 
 func PostDailyChallenge(session *discordgo.Session) {
 	var builder strings.Builder
+	cfg := ParseConfig()
+
 	challenge, err := getDailyChallenge()
 	if err != nil {
 		log.Printf("Error fetching challenge: %v", err)
@@ -79,12 +81,19 @@ func PostDailyChallenge(session *discordgo.Session) {
 	builder.WriteString(fmt.Sprintf("Difficulty: %s\n", challenge.Difficulty))
 	builder.WriteString(fmt.Sprintf("Link: \nhttps://leetcode.com%s\n", challenge.Link))
 
-	// TODO: need to establish default channel id
-	session.ChannelMessageSendComplex("1142252083706339341", &discordgo.MessageSend{
-		Embed: &discordgo.MessageEmbed{
-			Title:       "Daily Leetcode Challenge",
-			Description: builder.String(),
-			Color:       0xe8a726,
+	ping := fmt.Sprintf("<@&%s> ", cfg.LeetcodeRoleID)
+
+	_, err = session.ChannelMessageSendComplex(cfg.DefaultChannel, &discordgo.MessageSend{
+		Content: ping,
+		Embeds: []*discordgo.MessageEmbed{
+			{
+				Title:       "Daily LeetCode Challenge",
+				Description: builder.String(),
+				Color:       0xe8a726,
+			},
 		},
 	})
+	if err != nil {
+		log.Printf("Error sending challenge embed: %v", err)
+	}
 }

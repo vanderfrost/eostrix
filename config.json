@@ -1,3 +1,5 @@
 {
-  "securityToken": ""
+  "securityToken": "",
+  "defaultChannel": "",
+  "leetcodeRoleID": ""
 }
