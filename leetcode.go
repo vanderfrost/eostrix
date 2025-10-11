@@ -2,9 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type leetcodeResponse struct {
@@ -40,7 +44,7 @@ func parseLeetCodeResponse(resp *leetcodeResponse) LeetcodeChallenge {
 	}
 }
 
-func GetDailyChallenge() (LeetcodeChallenge, error) {
+func getDailyChallenge() (LeetcodeChallenge, error) {
 	url := "https://leetcode.com/graphql"
 	query := `{"query":"{ activeDailyCodingChallengeQuestion { date link question { title titleSlug difficulty } } }"}`
 
@@ -61,4 +65,26 @@ func GetDailyChallenge() (LeetcodeChallenge, error) {
 	}
 
 	return parseLeetCodeResponse(&lcr), nil
+}
+
+func PostDailyChallenge(session *discordgo.Session) {
+	var builder strings.Builder
+	challenge, err := getDailyChallenge()
+	if err != nil {
+		log.Printf("Error fetching challenge: %v", err)
+	}
+
+	builder.WriteString(fmt.Sprintf("Challenge Name: %s\n", challenge.Title))
+	builder.WriteString(fmt.Sprintf("Date: %s\n", challenge.Date))
+	builder.WriteString(fmt.Sprintf("Difficulty: %s\n", challenge.Difficulty))
+	builder.WriteString(fmt.Sprintf("Link: \nhttps://leetcode.com%s\n", challenge.Link))
+
+	// TODO: need to establish default channel id
+	session.ChannelMessageSendComplex("1142252083706339341", &discordgo.MessageSend{
+		Embed: &discordgo.MessageEmbed{
+			Title:       "Daily Leetcode Challenge",
+			Description: builder.String(),
+			Color:       0xe8a726,
+		},
+	})
 }
