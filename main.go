@@ -27,6 +27,13 @@ func main() {
 		PostDailyChallenge(disc)
 	})
 
+	problems, err := loadAllCompanyProblems("data")
+	if err != nil {
+		log.Fatal("failed to load company problems:", err)
+	}
+
+	fmt.Printf("loaded %d problems across %d companies\n", len(problems), len(problems))
+
 	//open
 	disc.Open()
 
