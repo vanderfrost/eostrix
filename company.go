@@ -16,6 +16,7 @@ type CompanyProblem struct {
 	Frequency      string
 	AcceptanceRate string
 	Link           string
+	Topics         []string
 }
 
 // search each company folder for the correct six month cvs file
@@ -84,6 +85,16 @@ func loadAllCompanyProblems(rootDir string) ([]CompanyProblem, error) {
 				continue
 			}
 
+			topics := []string{}
+			if len(record) > 5 {
+				for _, t := range record[5:] {
+					topic := strings.TrimSpace(t)
+					if topic != "" {
+						topics = append(topics, topic)
+					}
+				}
+			}
+
 			allProblems = append(allProblems, CompanyProblem{
 				Company:        companyName,
 				Difficulty:     record[0],
@@ -91,13 +102,14 @@ func loadAllCompanyProblems(rootDir string) ([]CompanyProblem, error) {
 				Frequency:      record[2],
 				AcceptanceRate: record[3],
 				Link:           record[4],
+				Topics:         topics,
 			})
 		}
 
 		f.Close()
 	}
 
-	fmt.Println(allProblems)
+	fmt.Printf("Loaded %d problems across %d companies\n", len(allProblems), len(entries))
 
 	return allProblems, nil
 }
