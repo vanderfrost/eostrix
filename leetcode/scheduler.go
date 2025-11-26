@@ -1,4 +1,4 @@
-package main
+package leetcode
 
 import (
 	"log"
@@ -7,7 +7,7 @@ import (
 
 // schedule task to be run at midnight UTC with a 5 minute delay
 // restart safe as it calculates the duration until next post on startup
-func scheduleMidnightUTCEvent(event func()) {
+func ScheduleMidnightUTCEvent(event func()) {
 	go func() {
 		for {
 			now := time.Now().UTC()

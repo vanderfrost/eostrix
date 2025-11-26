@@ -1,4 +1,4 @@
-package main
+package leetcode
 
 import (
 	"encoding/csv"
@@ -34,7 +34,7 @@ func findSixMonthCSV(companyDir string) (string, error) {
 }
 
 // load the leetcode problems from the six month cvs files to the CompanyProblem struct
-func loadAllCompanyProblems(rootDir string) ([]CompanyProblem, error) {
+func LoadAllCompanyProblems(rootDir string) ([]CompanyProblem, error) {
 	var allProblems []CompanyProblem
 
 	entries, err := os.ReadDir(rootDir)

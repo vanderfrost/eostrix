@@ -1,7 +1,8 @@
-package main
+package leetcode
 
 import (
 	"encoding/json"
+	"eostrix/config"
 	"fmt"
 	"io"
 	"log"
@@ -69,7 +70,7 @@ func getDailyChallenge() (LeetcodeChallenge, error) {
 
 func PostDailyChallenge(session *discordgo.Session) {
 	var builder strings.Builder
-	cfg := ParseConfig()
+	cfg := config.ParseConfig()
 
 	challenge, err := getDailyChallenge()
 	if err != nil {

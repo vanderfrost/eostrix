@@ -1,6 +1,8 @@
 package main
 
 import (
+	"eostrix/config"
+	"eostrix/leetcode"
 	"fmt"
 	"log"
 	"os"
@@ -15,7 +17,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, message *disco
 }
 
 func main() {
-	config := ParseConfig()
+	config := config.ParseConfig()
 
 	disc, err := discordgo.New("Bot " + config.SecurityToken)
 	if err != nil {
@@ -23,11 +25,11 @@ func main() {
 	}
 
 	disc.AddHandler(onMessage)
-	scheduleMidnightUTCEvent(func() {
-		PostDailyChallenge(disc)
+	leetcode.ScheduleMidnightUTCEvent(func() {
+		leetcode.PostDailyChallenge(disc)
 	})
 
-	_, err = loadAllCompanyProblems("data")
+	_, err = leetcode.LoadAllCompanyProblems("data")
 	if err != nil {
 		log.Fatal("failed to load company problems:", err)
 	}

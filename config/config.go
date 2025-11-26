@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func ParseConfig() *Config {
-	jsonFile, err := os.Open("config.json")
+	jsonFile, err := os.Open("config/config.json")
 	if err != nil {
 		log.Fatal(err)
 	}
