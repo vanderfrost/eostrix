@@ -9,7 +9,8 @@ import (
 	"strings"
 )
 
-type CompanyProblem struct {
+// represents an individual leetcode problem found within the csv file
+type Problem struct {
 	Company        string
 	Difficulty     string
 	Title          string
@@ -18,6 +19,13 @@ type CompanyProblem struct {
 	Link           string
 	Topics         []string
 }
+
+var (
+	AllProblems          []Problem
+	ProblemsByCompany    map[string][]*Problem
+	ProblemsByDifficulty map[string][]*Problem
+	ProblemsByTopic      map[string][]*Problem
+)
 
 // search each company folder for the correct six month cvs file
 func findSixMonthCSV(companyDir string) (string, error) {
@@ -34,8 +42,8 @@ func findSixMonthCSV(companyDir string) (string, error) {
 }
 
 // load the leetcode problems from the six month cvs files to the CompanyProblem struct
-func LoadAllCompanyProblems(rootDir string) ([]CompanyProblem, error) {
-	var allProblems []CompanyProblem
+func LoadAllProblems(rootDir string) ([]Problem, error) {
+	AllProblems = make([]Problem, 0)
 
 	entries, err := os.ReadDir(rootDir)
 	if err != nil {
@@ -95,7 +103,7 @@ func LoadAllCompanyProblems(rootDir string) ([]CompanyProblem, error) {
 				}
 			}
 
-			allProblems = append(allProblems, CompanyProblem{
+			AllProblems = append(AllProblems, Problem{
 				Company:        companyName,
 				Difficulty:     record[0],
 				Title:          record[1],
@@ -104,12 +112,34 @@ func LoadAllCompanyProblems(rootDir string) ([]CompanyProblem, error) {
 				Link:           record[4],
 				Topics:         topics,
 			})
+
+			pp := &AllProblems[len(AllProblems)-1]
+
+			createIndexes(pp)
 		}
 
 		f.Close()
 	}
 
-	fmt.Printf("Loaded %d problems across %d companies\n", len(allProblems), len(entries))
+	fmt.Printf("Loaded %d problems across %d companies\n", len(AllProblems), len(entries))
 
-	return allProblems, nil
+	return AllProblems, nil
+}
+
+// index for company, difficulty, and topics
+func createIndexes(p *Problem) {
+	ProblemsByCompany = make(map[string][]*Problem)
+	ProblemsByDifficulty = make(map[string][]*Problem)
+	ProblemsByTopic = make(map[string][]*Problem)
+
+	companyKey := strings.ToLower(p.Company)
+	ProblemsByCompany[companyKey] = append(ProblemsByCompany[companyKey], p)
+
+	diffKey := strings.ToLower(p.Difficulty)
+	ProblemsByDifficulty[diffKey] = append(ProblemsByDifficulty[diffKey], p)
+
+	for _, t := range p.Topics {
+		topicKey := strings.ToLower(t)
+		ProblemsByTopic[topicKey] = append(ProblemsByTopic[topicKey], p)
+	}
 }

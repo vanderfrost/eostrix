@@ -40,7 +40,7 @@ func main() {
 	})
 
 	//load company LC data
-	_, err = leetcode.LoadAllCompanyProblems("data")
+	_, err = leetcode.LoadAllProblems("data")
 	if err != nil {
 		log.Fatal("failed to load company problems:", err)
 	}
