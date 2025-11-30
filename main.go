@@ -29,7 +29,7 @@ func main() {
 		if i.Type == discordgo.InteractionApplicationCommand {
 			switch i.ApplicationCommandData().Name {
 			case "company":
-				//commands.HandleCompanyCommand()
+				commands.HandleCompanyCommand(s, i)
 			}
 		}
 	})
