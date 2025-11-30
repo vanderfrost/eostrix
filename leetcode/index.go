@@ -45,6 +45,10 @@ func findSixMonthCSV(companyDir string) (string, error) {
 func LoadAllProblems(rootDir string) ([]Problem, error) {
 	AllProblems = make([]Problem, 0)
 
+	ProblemsByCompany = make(map[string][]*Problem)
+	ProblemsByDifficulty = make(map[string][]*Problem)
+	ProblemsByTopic = make(map[string][]*Problem)
+
 	entries, err := os.ReadDir(rootDir)
 	if err != nil {
 		return nil, err
@@ -128,10 +132,6 @@ func LoadAllProblems(rootDir string) ([]Problem, error) {
 
 // index for company, difficulty, and topics
 func createIndexes(p *Problem) {
-	ProblemsByCompany = make(map[string][]*Problem)
-	ProblemsByDifficulty = make(map[string][]*Problem)
-	ProblemsByTopic = make(map[string][]*Problem)
-
 	companyKey := strings.ToLower(p.Company)
 	ProblemsByCompany[companyKey] = append(ProblemsByCompany[companyKey], p)
 
