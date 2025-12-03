@@ -3,6 +3,7 @@ package leetcode
 import (
 	"encoding/json"
 	"eostrix/config"
+	"eostrix/utils"
 	"fmt"
 	"io"
 	"log"
@@ -84,17 +85,5 @@ func PostDailyChallenge(session *discordgo.Session) {
 
 	ping := fmt.Sprintf("<@&%s> ", cfg.LeetcodeRoleID)
 
-	_, err = session.ChannelMessageSendComplex(cfg.DefaultChannel, &discordgo.MessageSend{
-		Content: ping,
-		Embeds: []*discordgo.MessageEmbed{
-			{
-				Title:       "Daily LeetCode Challenge",
-				Description: builder.String(),
-				Color:       0xe8a726,
-			},
-		},
-	})
-	if err != nil {
-		log.Printf("Error sending challenge embed: %v", err)
-	}
+	utils.SendPingMessageComplex(session, cfg.DefaultChannel, "Daily LeetCode Challenge", ping, builder.String())
 }

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"eostrix/leetcode"
+	"eostrix/utils"
 	"fmt"
 	"strings"
 
@@ -18,13 +19,13 @@ func HandleCompanyCommand(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	switch difficulty {
 	case "easy", "medium", "hard", "all":
 	default:
-		fmt.Println("Invalid difficulty provided.")
+		utils.ResponseError(s, i, "Invalid difficulty provided.")
 		return
 	}
 
 	problems, ok := leetcode.ProblemsByCompany[company]
 	if !ok || len(problems) == 0 {
-		fmt.Printf("No problems found for company %s\n", company)
+		utils.ResponseError(s, i, fmt.Sprintf("No problems found for company %s", company))
 		return
 	}
 
@@ -37,25 +38,16 @@ func HandleCompanyCommand(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	}
 
 	if len(filtered) == 0 {
-		fmt.Println("No matching problems for that difficulty.")
+		utils.ResponseError(s, i, "No matching problems for that difficulty.")
 		return
 	}
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("**%s** %s problems:\n\n",
-		company,
-		difficulty,
-	))
 
 	for _, p := range filtered {
-		sb.WriteString(fmt.Sprintf("• [%s] (%s) (%s)\n%s\n\n",
+		sb.WriteString(fmt.Sprintf("• %s (%s) (%s Frequency)\n%s\n\n",
 			p.Title, p.Difficulty, p.Frequency, p.Link))
 	}
 
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: sb.String(),
-		},
-	})
+	utils.Response(s, i, fmt.Sprintf("**%s** %s problems:\n\n", company, difficulty), sb.String())
 }
