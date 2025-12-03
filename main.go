@@ -30,6 +30,8 @@ func main() {
 			switch i.ApplicationCommandData().Name {
 			case "company":
 				commands.HandleCompanyCommand(s, i)
+			case "randlc":
+				commands.HandleRandCommand(s, i)
 			}
 		}
 	})

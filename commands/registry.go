@@ -1,6 +1,8 @@
 package commands
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/bwmarrin/discordgo"
+)
 
 func RegisterCommands(s *discordgo.Session) []*discordgo.ApplicationCommand {
 	commands := []*discordgo.ApplicationCommand{
@@ -25,6 +27,24 @@ func RegisterCommands(s *discordgo.Session) []*discordgo.ApplicationCommand {
 						{Name: "Medium", Value: "medium"},
 						{Name: "Hard", Value: "hard"},
 						{Name: "All", Value: "all"},
+					},
+				},
+			},
+		},
+		{
+			// /randlc <difficulty>
+			Name:        "randlc",
+			Description: "Returns a random LeetCode problem by difficulty",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "difficulty",
+					Description: "Select difficulty for random problem",
+					Required:    true,
+					Choices: []*discordgo.ApplicationCommandOptionChoice{
+						{Name: "Easy", Value: "easy"},
+						{Name: "Medium", Value: "medium"},
+						{Name: "Hard", Value: "hard"},
 					},
 				},
 			},
