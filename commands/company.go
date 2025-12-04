@@ -51,3 +51,30 @@ func HandleCompanyCommand(s *discordgo.Session, i *discordgo.InteractionCreate) 
 
 	utils.Response(s, i, fmt.Sprintf("**%s** %s problems:\n\n", company, difficulty), sb.String())
 }
+
+func CompanyAutocomplete(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	data := i.ApplicationCommandData()
+
+	userInput := strings.ToLower(data.Options[0].StringValue())
+	var suggestions []*discordgo.ApplicationCommandOptionChoice
+
+	for _, vc := range leetcode.ValidCompanies {
+		if strings.Contains(strings.ToLower(vc), userInput) {
+			suggestions = append(suggestions,
+				&discordgo.ApplicationCommandOptionChoice{
+					Name:  vc,
+					Value: vc,
+				})
+		}
+		if len(suggestions) == 25 {
+			break
+		}
+	}
+
+	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionApplicationCommandAutocompleteResult,
+		Data: &discordgo.InteractionResponseData{
+			Choices: suggestions,
+		},
+	})
+}

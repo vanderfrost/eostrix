@@ -25,6 +25,7 @@ var (
 	ProblemsByCompany    map[string][]*Problem
 	ProblemsByDifficulty map[string][]*Problem
 	ProblemsByTopic      map[string][]*Problem
+	ValidCompanies       []string
 )
 
 // search each company folder for the correct six month cvs file
@@ -61,6 +62,7 @@ func LoadAllProblems(rootDir string) ([]Problem, error) {
 
 		companyName := entry.Name()
 		companyDir := filepath.Join(rootDir, companyName)
+		ValidCompanies = append(ValidCompanies, companyName)
 
 		csvPath, err := findSixMonthCSV(companyDir)
 		if err != nil {

@@ -4,6 +4,7 @@ import (
 	"eostrix/commands"
 	"eostrix/config"
 	"eostrix/leetcode"
+	"eostrix/utils"
 	"fmt"
 	"log"
 	"os"
@@ -36,8 +37,10 @@ func main() {
 		}
 	})
 
+	disc.AddHandler(commands.CompanyAutocomplete)
+
 	//schedule daily post
-	leetcode.ScheduleMidnightUTCEvent(func() {
+	utils.ScheduleMidnightUTCEvent(func() {
 		leetcode.PostDailyChallenge(disc)
 	})
 
