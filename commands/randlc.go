@@ -37,11 +37,22 @@ func HandleRandCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	randomIndex := rng.Intn(len(list))
 	problem := list[randomIndex]
 
+	var topics []string
+	for _, t := range problem.Topics {
+		topics = append(topics, t)
+	}
+
+	topicString := "None"
+	if len(topics) > 0 {
+		topicString = strings.Join(topics, ", ")
+	}
+
 	var builder strings.Builder
 
-	builder.WriteString(fmt.Sprintf("Challenge Name: %s\n", problem.Title))
-	builder.WriteString(fmt.Sprintf("Difficulty: %s\n", problem.Difficulty))
-	builder.WriteString(fmt.Sprintf("Link: \nhttps://leetcode.com%s\n", problem.Link))
+	builder.WriteString(fmt.Sprintf("**Challenge Name:** %s\n", problem.Title))
+	builder.WriteString(fmt.Sprintf("**Difficulty:** %s\n", problem.Difficulty))
+	builder.WriteString(fmt.Sprintf("**Topics:** %s\n", topicString))
+	builder.WriteString(fmt.Sprintf("**Link:** \n%s\n", problem.Link))
 
 	utils.Response(s, i, fmt.Sprintf("Random %s LeetCode Problem", problem.Difficulty), builder.String())
 }
