@@ -22,10 +22,24 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//open
-	disc.Open()
+	if err := disc.Open(); err != nil {
+		log.Fatal(err)
+	}
+	defer disc.Close()
 
-	//register commands
+	initHandlers(disc)
+
+	if err := loadFeatures(disc); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("bot has started ...")
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+}
+
+func initHandlers(disc *discordgo.Session) {
 	commands.RegisterCommands(disc)
 	disc.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if i.Type == discordgo.InteractionApplicationCommand {
@@ -52,23 +66,13 @@ func main() {
 			commands.CompanyAutocomplete(s, i)
 		}
 	})
+}
 
-	//schedule daily post
+func loadFeatures(disc *discordgo.Session) error {
 	utils.ScheduleMidnightUTCEvent(func() {
 		leetcode.PostDailyChallenge(disc)
 	})
 
-	//load company LC data
-	_, err = leetcode.LoadAllProblems("data")
-	if err != nil {
-		log.Fatal("failed to load company problems:", err)
-	}
-
-	fmt.Println("bot has started ...")
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	<-c
-
-	//close
-	defer disc.Close()
+	_, err := leetcode.LoadAllProblems("data")
+	return err
 }
