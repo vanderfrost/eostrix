@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -35,9 +36,22 @@ func main() {
 				commands.HandleRandCommand(s, i)
 			}
 		}
+		if i.Type == discordgo.InteractionMessageComponent {
+			cid := i.MessageComponentData().CustomID
+			if strings.HasPrefix(cid, "company_next") {
+				commands.HandleCompanyPageChange(s, i, +1)
+			} else if strings.HasPrefix(cid, "company_prev") {
+				commands.HandleCompanyPageChange(s, i, -1)
+			}
+			return
+		}
 	})
 
-	disc.AddHandler(commands.CompanyAutocomplete)
+	disc.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		if i.Type == discordgo.InteractionApplicationCommandAutocomplete {
+			commands.CompanyAutocomplete(s, i)
+		}
+	})
 
 	//schedule daily post
 	utils.ScheduleMidnightUTCEvent(func() {

@@ -64,3 +64,35 @@ func SendPingMessageComplex(s *discordgo.Session, channelID, title, ping, descri
 		},
 	})
 }
+
+// first pagination post
+func ResponseComponents(s *discordgo.Session, i *discordgo.InteractionCreate, content string, components []discordgo.MessageComponent) {
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Description: content,
+					Color:       0xFFA116,
+				},
+			},
+			Components: components,
+		},
+	})
+}
+
+// use for all pagination pages except the initial post (editing)
+func ResponseComponentsEdit(s *discordgo.Session, i *discordgo.InteractionCreate, content string, components []discordgo.MessageComponent) {
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseUpdateMessage,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Description: content,
+					Color:       0xFFA116,
+				},
+			},
+			Components: components,
+		},
+	})
+}
