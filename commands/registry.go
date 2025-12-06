@@ -50,6 +50,31 @@ func RegisterCommands(s *discordgo.Session) []*discordgo.ApplicationCommand {
 				},
 			},
 		},
+		{
+			// /topics <category>
+			Name:        "topics",
+			Description: "Returns LeetCode problems associated with a topic category",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "category",
+					Description: "Category - eg. Array",
+					Type:        discordgo.ApplicationCommandOptionString,
+					Required:    true,
+					//Autocomplete: true,
+				},
+				{
+					Name:        "difficulty",
+					Description: "difficulty (easy/medium/hard)",
+					Type:        discordgo.ApplicationCommandOptionString,
+					Required:    true,
+					Choices: []*discordgo.ApplicationCommandOptionChoice{
+						{Name: "Easy", Value: "easy"},
+						{Name: "Medium", Value: "medium"},
+						{Name: "Hard", Value: "hard"},
+					},
+				},
+			},
+		},
 	}
 
 	for _, cmd := range commands {

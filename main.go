@@ -48,6 +48,8 @@ func initHandlers(disc *discordgo.Session) {
 				commands.HandleCompanyCommand(s, i)
 			case "randlc":
 				commands.HandleRandCommand(s, i)
+			case "topics":
+				commands.HandleTopicsCommand(s, i)
 			}
 		}
 		if i.Type == discordgo.InteractionMessageComponent {
