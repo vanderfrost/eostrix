@@ -105,15 +105,7 @@ func LoadAllProblems(rootDir string) ([]Problem, error) {
 				continue
 			}
 
-			topics := []string{}
-			if len(record) > 5 {
-				for _, t := range record[5:] {
-					topic := strings.TrimSpace(t)
-					if topic != "" {
-						topics = append(topics, topic)
-					}
-				}
-			}
+			topics := parseTopics(record[5:])
 
 			AllProblems = append(AllProblems, Problem{
 				Company:        companyName,
@@ -149,10 +141,27 @@ func createIndexes(p *Problem) {
 
 	for _, t := range p.Topics {
 		key := strings.ToLower(t)
-		if _, exists := topicSet[key]; exists {
-			continue
+
+		ProblemsByTopic[key] = append(ProblemsByTopic[key], p)
+
+		if _, exists := topicSet[key]; !exists {
+			topicSet[key] = struct{}{}
+			ValidTopics = append(ValidTopics, t)
 		}
-		topicSet[key] = struct{}{}
-		ValidTopics = append(ValidTopics, t)
 	}
+}
+
+func parseTopics(columns []string) []string {
+	var topics []string
+
+	for _, col := range columns {
+		for part := range strings.SplitSeq(col, ",") {
+			topic := strings.TrimSpace(part)
+			if topic != "" {
+				topics = append(topics, topic)
+			}
+		}
+	}
+
+	return topics
 }
