@@ -53,3 +53,48 @@ func HandleTopicsCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	utils.Response(s, i, fmt.Sprintf("%s Topic Problems", topic), sb.String())
 }
+
+func TopicsAutocomplete(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	data := i.ApplicationCommandData()
+
+	var userInput string
+	for _, opt := range data.Options {
+		if opt.Focused {
+			userInput = strings.ToLower(opt.StringValue())
+			break
+		}
+	}
+
+	if userInput == "" {
+		if userInput == "" {
+			_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionApplicationCommandAutocompleteResult,
+				Data: &discordgo.InteractionResponseData{
+					Choices: []*discordgo.ApplicationCommandOptionChoice{},
+				},
+			})
+			return
+		}
+	}
+
+	suggestions := make([]*discordgo.ApplicationCommandOptionChoice, 0, 25)
+
+	for _, vt := range leetcode.ValidTopics {
+		if strings.Contains(strings.ToLower(vt), userInput) {
+			suggestions = append(suggestions, &discordgo.ApplicationCommandOptionChoice{
+				Name:  vt,
+				Value: vt,
+			})
+		}
+		if len(suggestions) == 25 {
+			break
+		}
+	}
+
+	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionApplicationCommandAutocompleteResult,
+		Data: &discordgo.InteractionResponseData{
+			Choices: suggestions,
+		},
+	})
+}

@@ -25,7 +25,9 @@ var (
 	ProblemsByCompany    map[string][]*Problem
 	ProblemsByDifficulty map[string][]*Problem
 	ProblemsByTopic      map[string][]*Problem
+	topicSet             = map[string]struct{}{}
 	ValidCompanies       []string
+	ValidTopics          []string
 )
 
 // search each company folder for the correct six month cvs file
@@ -49,6 +51,10 @@ func LoadAllProblems(rootDir string) ([]Problem, error) {
 	ProblemsByCompany = make(map[string][]*Problem)
 	ProblemsByDifficulty = make(map[string][]*Problem)
 	ProblemsByTopic = make(map[string][]*Problem)
+
+	ValidCompanies = nil
+	ValidTopics = nil
+	topicSet = make(map[string]struct{})
 
 	entries, err := os.ReadDir(rootDir)
 	if err != nil {
@@ -128,6 +134,7 @@ func LoadAllProblems(rootDir string) ([]Problem, error) {
 	}
 
 	fmt.Printf("Loaded %d problems across %d companies\n", len(AllProblems), len(entries))
+	fmt.Printf("Loaded %d topics accross %d problems\n", len(ValidTopics), len(AllProblems))
 
 	return AllProblems, nil
 }
@@ -141,7 +148,11 @@ func createIndexes(p *Problem) {
 	ProblemsByDifficulty[diffKey] = append(ProblemsByDifficulty[diffKey], p)
 
 	for _, t := range p.Topics {
-		topicKey := strings.ToLower(t)
-		ProblemsByTopic[topicKey] = append(ProblemsByTopic[topicKey], p)
+		key := strings.ToLower(t)
+		if _, exists := topicSet[key]; exists {
+			continue
+		}
+		topicSet[key] = struct{}{}
+		ValidTopics = append(ValidTopics, t)
 	}
 }

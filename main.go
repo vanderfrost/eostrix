@@ -65,7 +65,13 @@ func initHandlers(disc *discordgo.Session) {
 
 	disc.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if i.Type == discordgo.InteractionApplicationCommandAutocomplete {
-			commands.CompanyAutocomplete(s, i)
+
+			switch i.ApplicationCommandData().Name {
+			case "company":
+				commands.CompanyAutocomplete(s, i)
+			case "topics":
+				commands.TopicsAutocomplete(s, i)
+			}
 		}
 	})
 }
