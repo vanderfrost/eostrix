@@ -4,12 +4,14 @@ import (
 	"eostrix/leetcode"
 	"eostrix/utils"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 // syntax for command is /topics <category> <difficulty>
+const topicsPageSize = 10
 
 func HandleTopicsCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	data := i.ApplicationCommandData()
@@ -37,21 +39,7 @@ func HandleTopicsCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	// envoke a ten problem limit
-	// (just to test and see if the command works without pagination or autocomplete)
-	limit := 10
-	if len(filtered) > limit {
-		filtered = filtered[:limit]
-	}
-
-	var sb strings.Builder
-
-	for _, p := range filtered {
-		sb.WriteString(fmt.Sprintf("• %s (%s) (%s Frequency)\n%s\n\n",
-			p.Title, p.Difficulty, p.Frequency, p.Link))
-	}
-
-	utils.Response(s, i, fmt.Sprintf("%s Topic Problems", topic), sb.String())
+	renderTopicsPage(s, i, topic, difficulty, filtered, 0, true)
 }
 
 func TopicsAutocomplete(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -97,4 +85,101 @@ func TopicsAutocomplete(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Choices: suggestions,
 		},
 	})
+}
+
+func renderTopicsPage(
+	s *discordgo.Session,
+	i *discordgo.InteractionCreate,
+	topic, difficulty string,
+	problems []*leetcode.Problem,
+	page int,
+	first bool) {
+	totalPages := (len(problems) + topicsPageSize - 1) / topicsPageSize
+
+	start := page * topicsPageSize
+	end := start + topicsPageSize
+
+	if start >= len(problems) {
+		start = 0
+		page = 0
+	}
+	if end > len(problems) {
+		end = len(problems)
+	}
+
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf(
+		"**Topic:** %s\n**Difficulty:** %s\n**Page:** %d / %d\n\n",
+		topic,
+		difficulty,
+		page+1,
+		totalPages,
+	))
+
+	for _, p := range problems[start:end] {
+		sb.WriteString(fmt.Sprintf(
+			"• %s (%s, %s Frequency)\n%s\n\n",
+			p.Title, p.Difficulty, p.Frequency, p.Link,
+		))
+	}
+
+	components := []discordgo.MessageComponent{
+		discordgo.ActionsRow{
+			Components: []discordgo.MessageComponent{
+				discordgo.Button{
+					Label:    "Prev",
+					Style:    discordgo.PrimaryButton,
+					CustomID: fmt.Sprintf("topics_prev:%s:%s:%d", topic, difficulty, page),
+					Disabled: page == 0,
+				},
+				discordgo.Button{
+					Label:    "Next",
+					Style:    discordgo.PrimaryButton,
+					CustomID: fmt.Sprintf("topics_next:%s:%s:%d", topic, difficulty, page),
+					Disabled: page >= totalPages-1,
+				},
+			},
+		},
+	}
+
+	if first {
+		utils.ResponseComponents(s, i, sb.String(), components)
+	} else {
+		utils.ResponseComponentsEdit(s, i, sb.String(), components)
+	}
+}
+
+func HandleTopicsPageChange(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	parts := strings.Split(i.MessageComponentData().CustomID, ":")
+	if len(parts) != 4 {
+		return
+	}
+
+	action := parts[0]
+	topic := parts[1]
+	difficulty := parts[2]
+	page, _ := strconv.Atoi(parts[3])
+
+	if action == "topics_next" {
+		page++
+	} else {
+		page--
+	}
+
+	problems := filterByDifficulty(
+		leetcode.ProblemsByTopic[topic],
+		difficulty,
+	)
+
+	renderTopicsPage(s, i, topic, difficulty, problems, page, false)
+}
+
+func filterByDifficulty(problems []*leetcode.Problem, diff string) []*leetcode.Problem {
+	var out []*leetcode.Problem
+	for _, p := range problems {
+		if strings.EqualFold(p.Difficulty, diff) {
+			out = append(out, p)
+		}
+	}
+	return out
 }

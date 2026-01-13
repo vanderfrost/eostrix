@@ -54,10 +54,12 @@ func initHandlers(disc *discordgo.Session) {
 		}
 		if i.Type == discordgo.InteractionMessageComponent {
 			cid := i.MessageComponentData().CustomID
-			if strings.HasPrefix(cid, "company_next") {
-				commands.HandleCompanyPageChange(s, i, +1)
-			} else if strings.HasPrefix(cid, "company_prev") {
-				commands.HandleCompanyPageChange(s, i, -1)
+
+			switch {
+			case strings.HasPrefix(cid, "company_"):
+				commands.HandleCompanyPageChange(s, i, 0)
+			case strings.HasPrefix(cid, "topics_"):
+				commands.HandleTopicsPageChange(s, i)
 			}
 			return
 		}
