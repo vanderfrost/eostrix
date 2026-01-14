@@ -83,7 +83,7 @@ func CompanyAutocomplete(s *discordgo.Session, i *discordgo.InteractionCreate) {
 // renderCompanyPage handles both first page posting and editing of all other pages
 func renderCompanyPage(s *discordgo.Session, i *discordgo.InteractionCreate, data *leetcode.PageData, company, difficulty string, first bool) {
 	start := data.Page * data.PageSize
-	end := min(start+data.PageSize, len(data.Problems))
+	end := utils.Min(start+data.PageSize, len(data.Problems))
 
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf(
