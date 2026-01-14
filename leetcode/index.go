@@ -155,7 +155,8 @@ func parseTopics(columns []string) []string {
 	var topics []string
 
 	for _, col := range columns {
-		for part := range strings.SplitSeq(col, ",") {
+		// im using an old go version (1.23) so split is preferable to splitseq here
+		for _, part := range strings.Split(col, ",") {
 			topic := strings.TrimSpace(part)
 			if topic != "" {
 				topics = append(topics, topic)
